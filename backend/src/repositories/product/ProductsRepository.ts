@@ -35,7 +35,7 @@ export class ProductsRepository implements IProductsRepository {
     await this.repository.delete(id);
   }
 
-  // verifica se exite mais de um produto pelas características
+  // verifica se exite mais de um produto pelas características, vai ser usado para evitar que o mesmo produto seja criado mais de uma vez
   async findExactProduct(brand: string, description: string, size: string, color: string): Promise<Product | null> {
     return await this.repository.findOne({
       where: {

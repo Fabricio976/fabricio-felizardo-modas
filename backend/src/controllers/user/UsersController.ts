@@ -18,7 +18,7 @@ async create(request: Request, response: Response): Promise<Response> {
       if (error instanceof Error) {
         return response.status(400).json({ error: error.message });
       }
-      return response.status(500).json({ error: "Internal server error" });
+      return response.status(500).json({ error: "Erro interno do servidor!" });
     }
   }
 
