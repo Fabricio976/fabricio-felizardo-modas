@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import express, { NextFunction, Request, Response } from "express";
 import { router } from "./routes";
-import "./shared/container";
+import "./shared";
 import "express-async-errors"; 
 import cors from "cors";
 
