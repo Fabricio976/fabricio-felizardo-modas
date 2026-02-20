@@ -1,28 +1,40 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, OneToMany } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from "typeorm";
 import { User } from "../user/User";
 import { OrderedItem } from "./OrderedItem";
 
-@Entity("orders")
+@Entity("ordereds")
 export class Ordered {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ name: "user_id" }) 
-  user_id!: string;
-
-  @ManyToOne(() => User) 
+  @ManyToOne(() => User)
   @JoinColumn({ name: "user_id" })
   user!: User;
 
-  @OneToMany(() => OrderedItem, (item) => item.ordered, { cascade: true }) 
+  @Column()
+  user_id!: string;
+
+  @OneToMany(() => OrderedItem, (item) => item.ordered, { cascade: true })
   items!: OrderedItem[];
 
-  @Column({ type: "decimal", precision: 10, scale: 2 })
+  @Column("decimal", { precision: 10, scale: 2 })
   total!: number;
 
-  @Column({ default: "PENDING" }) // Status: PENDING, PAID, CANCELED
+  @Column()
   status!: string;
 
   @CreateDateColumn()
   created_at!: Date;
+
+  @UpdateDateColumn()
+  updated_at!: Date;
 }

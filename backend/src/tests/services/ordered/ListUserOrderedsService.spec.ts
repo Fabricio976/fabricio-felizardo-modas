@@ -1,43 +1,39 @@
 import { ListUserOrderedsService } from "../../../services/ordered/ListUserOrderedsService";
-import { IOrderedsRepository } from "../../../repositories/ordered/IOrderedsRepository";
 
-const orderedsRepositoryMock = {
-  create: jest.fn(),
-  findByUserId: jest.fn(),
-};
+let listUserOrderedsService: ListUserOrderedsService;
+let orderedsRepositorySpy: any;
 
-describe("ListUserOrderedsService", () => {
-  let listUserOrderedsService: ListUserOrderedsService;
-
+describe("List User Ordereds", () => {
   beforeEach(() => {
-    listUserOrderedsService = new ListUserOrderedsService(
-      orderedsRepositoryMock as unknown as IOrderedsRepository
-    );
-    jest.clearAllMocks();
+    orderedsRepositorySpy = {
+      listByUser: jest.fn(),
+    };
+    listUserOrderedsService = new ListUserOrderedsService(orderedsRepositorySpy);
   });
 
-  it("deve listar os pedidos de um usuário específico", async () => {
-    const userId = "user-123";
-    const userOrders = [
-      { id: "order-1", total: 100, user_id: userId },
-      { id: "order-2", total: 50, user_id: userId },
+  it("deve ser possível listar todos os pedidos de um usuário.", async () => {
+    const mockOrders = [
+      {
+        id: "order-1",
+        total: 100,
+        items: [
+          { 
+            id: "item-1", 
+            name: "Camisa", 
+            size: "M", 
+            price: 100, 
+            quantity: 1 
+          }
+        ]
+      }
     ];
 
-    orderedsRepositoryMock.findByUserId.mockResolvedValue(userOrders);
+    orderedsRepositorySpy.listByUser.mockResolvedValue(mockOrders);
 
-    const result = await listUserOrderedsService.execute(userId);
+    const orders = await listUserOrderedsService.execute("user-id");
 
-    expect(result).toEqual(userOrders);
-    expect(orderedsRepositoryMock.findByUserId).toHaveBeenCalledWith(userId);
-    expect(orderedsRepositoryMock.findByUserId).toHaveBeenCalledTimes(1);
-  });
-
-  it("deve retornar uma lista vazia se o usuário não tiver pedidos", async () => {
-    orderedsRepositoryMock.findByUserId.mockResolvedValue([]);
-
-    const result = await listUserOrderedsService.execute("user-sem-pedidos");
-
-    expect(result).toEqual([]);
-    expect(result).toHaveLength(0);
+    expect(orders).toHaveLength(1);
+    expect(orders[0].items[0].size).toBe("M");
+    expect(orderedsRepositorySpy.listByUser).toHaveBeenCalledWith("user-id");
   });
 });

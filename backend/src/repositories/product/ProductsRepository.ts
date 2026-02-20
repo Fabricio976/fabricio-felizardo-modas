@@ -13,9 +13,7 @@ export class ProductsRepository implements IProductsRepository {
 
   async create(data: ICreateProductDTO): Promise<Product> {
     const product = this.repository.create(data);
-    
     await this.repository.save(product);
-
     return product;
   }
 
@@ -35,15 +33,13 @@ export class ProductsRepository implements IProductsRepository {
     await this.repository.delete(id);
   }
 
-  // verifica se exite mais de um produto pelas características, vai ser usado para evitar que o mesmo produto seja criado mais de uma vez
-  async findExactProduct(brand: string, description: string, size: string, color: string): Promise<Product | null> {
-    return await this.repository.findOne({
+  async findExactProduct(name: string, brand: string): Promise<Product | null> {
+    const product = await this.repository.findOne({
       where: {
-        brand,
-        description,
-        size,
-        color
+        name,
+        brand
       }
     });
+    return product;
   }
 }

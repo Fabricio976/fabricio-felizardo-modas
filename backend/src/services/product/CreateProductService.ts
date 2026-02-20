@@ -1,6 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { IProductsRepository } from "../../repositories/product/IProductsRepository";
 import { ICreateProductDTO } from "../../schemas/product.schema";
+import { AppError } from "../../shared/errors/AppError"; 
 
 @injectable()
 export class CreateProductService {
@@ -10,29 +11,17 @@ export class CreateProductService {
     private productsRepository: IProductsRepository
   ) {}
 
-  async execute({ brand, description, price, category, size, color, stock_quantity, image_url }: ICreateProductDTO) {
-
+  async execute(data: ICreateProductDTO) {
     const productAlreadyExists = await this.productsRepository.findExactProduct(
-      brand, 
-      description, 
-      size, 
-      color
+      data.name,
+      data.brand
     );
 
     if (productAlreadyExists) {
-      throw new Error("Já existe um produto cadastrado com essas especificações (Marca, Modelo, Cor e Tamanho).");
+      throw new AppError("Já existe um produto cadastrado com esse Nome e Marca.");
     }
 
-    const product = await this.productsRepository.create({
-      brand,
-      description,
-      price,
-      category,
-      size,
-      color,
-      stock_quantity,
-      image_url
-    });
+    const product = await this.productsRepository.create(data);
 
     return product;
   }

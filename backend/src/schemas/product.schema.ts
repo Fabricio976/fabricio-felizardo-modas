@@ -1,39 +1,20 @@
 import { z } from "zod";
 
 export const createProductSchema = z.object({
-  brand: z
-    .string()
-    .min(2, { message: "A marca deve ter pelo menos 2 caracteres" }),
-
-  description: z
-    .string()
-    .min(3, { message: "A descrição deve ter detalhes do produto" }),
-
-  price: z
-    .number()
-    .positive({ message: "O preço deve ser positivo" }),
-
-  category: z
-    .string()
-    .min(1, { message: "A categoria é obrigatória" }),
-
-  size: z
-    .string()
-    .min(1, { message: "O tamanho é obrigatório" }),
-
-  color: z
-    .string()
-    .min(1, { message: "A cor é obrigatória" }),
-
-  stock_quantity: z
-    .number()
-    .int({ message: "A quantidade deve ser um número inteiro" })
-    .nonnegative({ message: "A quantidade não pode ser negativa" }),
-
-  image_url: z
-    .string()
-    .url({ message: "URL da imagem inválida" })
-    .optional(),
+  name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
+  brand: z.string().min(2, "A marca é obrigatória"),
+  category: z.string().min(1, "A categoria é obrigatória"),
+  gender: z.enum(["Masculino", "Feminino", "Unissex"]).catch("Masculino"),
+  price: z.number().positive("O preço deve ser positivo"),
+  image: z.string().optional(),
+  hoverImage: z.string().optional(),
+  
+  sizes: z.array(z.string()).min(1, "Selecione pelo menos um tamanho"),
+  
+  stock: z.number().int().nonnegative(),
+  description: z.string().min(10, "A descrição deve ser mais detalhada"),
+  material: z.string().min(2, "Informe o material do produto"),
+  isNew: z.boolean().optional(),
 });
 
 export type ICreateProductDTO = z.infer<typeof createProductSchema>;

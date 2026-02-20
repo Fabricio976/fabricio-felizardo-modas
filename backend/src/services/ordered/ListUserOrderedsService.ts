@@ -10,7 +10,7 @@ export class ListUserOrderedsService {
   ) {}
 
   async execute(user_id: string): Promise<Ordered[]> {
-    const ordereds = await this.orderedsRepository.findByUserId(user_id);
+    const ordereds = await this.orderedsRepository.listByUser(user_id);
     return ordereds;
   }
 }

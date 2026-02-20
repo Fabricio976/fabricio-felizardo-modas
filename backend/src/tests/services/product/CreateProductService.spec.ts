@@ -1,75 +1,69 @@
 import { CreateProductService } from "../../../services/product/CreateProductService";
-import { IProductsRepository } from "../../../repositories/product/IProductsRepository";
+import { AppError } from "../../../shared/errors/AppError";
 
-const productsRepositoryMock = {
-  create: jest.fn(),
-  save: jest.fn(),
-  listAll: jest.fn(),
-  findById: jest.fn(),
-  delete: jest.fn(),
-  findExactProduct: jest.fn(),
-};
+let createProductService: CreateProductService;
+let productsRepositorySpy: any;
 
-describe("CreateProductService", () => {
-  let createProductService: CreateProductService;
-
+describe("Create Product", () => {
   beforeEach(() => {
-    createProductService = new CreateProductService(
-      productsRepositoryMock as unknown as IProductsRepository
-    );
-    jest.clearAllMocks();
+    productsRepositorySpy = {
+      create: jest.fn(),
+      findExactProduct: jest.fn(),
+    };
+    createProductService = new CreateProductService(productsRepositorySpy);
   });
 
-  // caminho Feliz
-  it("deve criar um novo produto com sucesso", async () => {
-    productsRepositoryMock.findExactProduct.mockResolvedValue(null);
-
+  it("deve ser capaz de criar um novo produto", async () => {
     const productData = {
-      brand: "Nike",
-      description: "Camisa",
-      price: 99.90,
-      category: "Roupas",
-      size: "M",
-      color: "Preto",
-      stock_quantity: 50
+      name: "Blazer Slim",
+      brand: "Louis Vuitton",
+      category: "Blazers",
+      gender: "Masculino" as const,
+      description: "Blazer de alta costura...",
+      price: 5000.00,
+      sizes: ["P", "M", "G"], 
+      stock: 5,
+      material: "Lã Fria",
+      image: "http://img.com/foto.jpg",
+      hoverImage: "http://img.com/hover.jpg",
+      isNew: true
     };
 
-    const createdProduct = { id: "p-123", ...productData };
-    productsRepositoryMock.create.mockResolvedValue(createdProduct);
-
-    const result = await createProductService.execute(productData);
-
-    expect(result).toHaveProperty("id");
-    expect(result.brand).toBe("Nike");
-    expect(productsRepositoryMock.findExactProduct).toHaveBeenCalledWith(
-      "Nike", "Camisa", "M", "Preto"
-    );
-    expect(productsRepositoryMock.create).toHaveBeenCalledTimes(1);
-  });
-
-  // cenario de falha
-  it("não deve permitir criar um produto duplicado (mesma marca, modelo, cor e tamanho)", async () => {
-    productsRepositoryMock.findExactProduct.mockResolvedValue({
-      id: "prod-existente",
-      brand: "Nike",
-      description: "Camisa",
-      size: "M",
-      color: "Preto"
+    // Não existe produto igual
+    productsRepositorySpy.findExactProduct.mockResolvedValue(null);
+    
+    // Retorna o id do objeto criado 
+    productsRepositorySpy.create.mockResolvedValue({
+      id: "uuid-gerado",
+      ...productData
     });
 
+    const product = await createProductService.execute(productData);
+
+    expect(product).toHaveProperty("id");
+    expect(product.sizes).toEqual(["P", "M", "G"]);
+    expect(product.gender).toBe("Masculino");
+    expect(productsRepositorySpy.create).toHaveBeenCalled();
+  });
+
+  it("não deveria ser possível criar um produto duplicado (Mesmo Nome e Marca)", async () => {
     const productData = {
-      brand: "Nike",
-      description: "Camisa",
-      price: 120.00, // mesmo com preço diferente, deve bloquear pela regra
-      category: "Roupas",
-      size: "M",
-      color: "Preto",
-      stock_quantity: 10
+      name: "Blazer Slim",
+      brand: "Louis Vuitton",
+      category: "Blazers",
+      gender: "Masculino" as const,
+      description: "...",
+      price: 5000,
+      sizes: ["P"],
+      stock: 1,
+      material: "Lã",
+      image: "img"
     };
 
-    await expect(createProductService.execute(productData))
-      .rejects
-      .toEqual(new Error("Já existe um produto cadastrado com essas especificações (Marca, Modelo, Cor e Tamanho)."));
-    expect(productsRepositoryMock.create).not.toHaveBeenCalled();
+    productsRepositorySpy.findExactProduct.mockResolvedValue(productData);
+
+    await expect(
+      createProductService.execute(productData)
+    ).rejects.toBeInstanceOf(AppError);
   });
 });

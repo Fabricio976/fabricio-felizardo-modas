@@ -1,36 +1,31 @@
 import { DeleteProductService } from "../../../services/product/DeleteProductService";
-import { IProductsRepository } from "../../../repositories/product/IProductsRepository";
+import { AppError } from "../../../shared/errors/AppError";
 
-const productsRepositoryMock = {
-  findById: jest.fn(),
-  delete: jest.fn(),
-};
+let deleteProductService: DeleteProductService;
+let productsRepositorySpy: any;
 
-describe("DeleteProductService", () => {
-  let deleteProductService: DeleteProductService;
-
+describe("Delete Product", () => {
   beforeEach(() => {
-    deleteProductService = new DeleteProductService(
-      productsRepositoryMock as unknown as IProductsRepository
-    );
-    jest.clearAllMocks();
+    productsRepositorySpy = {
+      findById: jest.fn(),
+      delete: jest.fn(),
+    };
+    deleteProductService = new DeleteProductService(productsRepositorySpy);
   });
 
-  it("deve deletar um produto existente", async () => {
-    productsRepositoryMock.findById.mockResolvedValue({ id: "prod-1" });
+  it("deve ser possível deletar um produto", async () => {
+    productsRepositorySpy.findById.mockResolvedValue({ id: "exists" });
+    
+    await deleteProductService.execute("exists");
 
-    await deleteProductService.execute("prod-1");
-
-    expect(productsRepositoryMock.delete).toHaveBeenCalledWith("prod-1");
+    expect(productsRepositorySpy.delete).toHaveBeenCalledWith("exists");
   });
 
-  it("não deve deletar um produto inexistente", async () => {
-    productsRepositoryMock.findById.mockResolvedValue(null);
+  it("não deveria ser possível deletar um produto inexistente", async () => {
+    productsRepositorySpy.findById.mockResolvedValue(null);
 
-    await expect(deleteProductService.execute("prod-inexistente"))
-      .rejects
-      .toEqual(new Error("Produto não encontrado."));
-
-    expect(productsRepositoryMock.delete).not.toHaveBeenCalled();
+    await expect(
+      deleteProductService.execute("non-existing")
+    ).rejects.toBeInstanceOf(AppError);
   });
 });

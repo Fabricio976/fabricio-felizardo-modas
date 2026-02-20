@@ -5,35 +5,36 @@ import { ListUserOrderedsService } from "../../services/ordered/ListUserOrdereds
 import { CancelOrderedService } from "../../services/ordered/CancelOrderedService";
 
 export class OrderedsController {
+  
   async create(request: Request, response: Response): Promise<Response> {
-    const { id: user_id } = request.user;
-    const { products } = request.body;
+    const { items } = request.body;
+    const userId = request.user.id;
+
     const createOrderedService = container.resolve(CreateOrderedService);
 
-    const order = await createOrderedService.execute({
-      user_id,
-      items: products,
-    });
+    const order = await createOrderedService.execute({ items }, userId);
 
     return response.status(201).json(order);
   }
 
   async showByUser(request: Request, response: Response): Promise<Response> {
-    const { id: user_id } = request.user;
+    const userId = request.user.id;
+
     const listUserOrderedsService = container.resolve(ListUserOrderedsService);
-    const orders = await listUserOrderedsService.execute(user_id);
+
+    const orders = await listUserOrderedsService.execute(userId);
 
     return response.json(orders);
   }
 
   async cancel(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params; // id do pedido
-    const { id: user_id } = request.user; // id do usuário logado
+    const { id } = request.params; 
+    const userId = request.user.id;
 
     const cancelOrderedService = container.resolve(CancelOrderedService);
 
-    await cancelOrderedService.execute(id, user_id);
+    await cancelOrderedService.execute(id, userId);
 
-    return response.status(200).json({ message: "Pedido cancelado com sucesso." });
+    return response.status(204).send();
   }
 }
