@@ -41,7 +41,7 @@ const FiftyFiftySection = () => {
               Coleção Feminina
             </h3>
             <p className="text-sm font-light text-foreground">
-              Elegância atemporal em vestidos, saias e peças de alta costura
+              Elegância atemporal em vestidos, saias e peças de alta costuras 
             </p>
           </div>
         </div>
