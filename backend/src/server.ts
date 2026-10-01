@@ -1,4 +1,4 @@
-import { AppDataSource } from "./config/data-source";
+import { AppDataSource } from "./config/DataSource";
 import { app } from "./app";
 
 AppDataSource.initialize()

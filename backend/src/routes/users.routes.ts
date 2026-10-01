@@ -8,7 +8,8 @@ export const usersRoutes = Router();
 
 const usersController = new UsersController();
 
-usersRoutes.post("/", 
+usersRoutes.post(
+    "/", 
     ensureDataIsValid(createUserSchema),
     usersController.create
 );
