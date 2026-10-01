@@ -4,6 +4,6 @@ export default {
   bail: true, 
   clearMocks: true, 
   coverageProvider: "v8",
-  matchTestMatch: ["**/*.spec.ts"],
+  testMatch: ["**/*.spec.ts"],
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
 };
