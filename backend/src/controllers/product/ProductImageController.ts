@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { container } from "tsyringe";
 import { UpdateProductImageService } from "../../services/product/UpdateProductImageService";
+import { AppError } from "../../shared/errors/AppError";
 
 export class ProductImageController {
   async update(request: Request, response: Response): Promise<Response> {
@@ -8,7 +9,7 @@ export class ProductImageController {
     const image_filename = request.file?.filename;
 
     if (!image_filename) {
-        return response.status(400).json({ error: "A imagem é obrigatória." });
+        throw new AppError("A imagem é obrigatória.", 400);
     }
 
     const updateProductImageService = container.resolve(UpdateProductImageService);

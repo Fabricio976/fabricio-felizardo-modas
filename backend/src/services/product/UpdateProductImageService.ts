@@ -1,5 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { IProductsRepository } from "../../repositories/product/IProductsRepository";
+import { AppError } from "../../shared/errors/AppError";
 import fs from "fs";
 import path from "path";
 import uploadConfig from "../../config/upload";
@@ -20,11 +21,12 @@ export class UpdateProductImageService {
     const product = await this.productsRepository.findById(product_id);
 
     if (!product) {
-      throw new Error("Produto não encontrado.");
+      throw new AppError("Produto não encontrado.", 404);
     }
 
-    if (product.image_url) {
-      const productPreviousImage = path.join(uploadConfig.tmpFolder, product.image_url);
+    // Deleta a imagem antiga se existir
+    if (product.image) { 
+      const productPreviousImage = path.join(uploadConfig.tmpFolder, product.image);
       const fileExists = await fs.promises.stat(productPreviousImage).catch(() => false);
 
       if (fileExists) {
@@ -32,7 +34,8 @@ export class UpdateProductImageService {
       }
     }
 
-    product.image_url = image_filename; // salva apenas o nome do arquivo no banco, gambiarra so para demostração rápida
+    // Salva a nova imagem
+    product.image = image_filename;
 
     await this.productsRepository.save(product);
   }

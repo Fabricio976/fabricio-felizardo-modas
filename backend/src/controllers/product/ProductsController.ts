@@ -9,20 +9,19 @@ import { DeleteProductService } from "../../services/product/DeleteProductServic
 export class ProductsController {
 
     async create(request: Request, response: Response): Promise<Response> {
-        
-        const { brand, description, price, category, size, color, stock_quantity, image_url } = request.body;
+        const { 
+            name, brand, category, gender, price, 
+            sizes, stock, description, material, isNew,
+            image, hoverImage 
+        } = request.body;
+
         const createProductService = container.resolve(CreateProductService);
 
         try {
             const product = await createProductService.execute({
-                brand,
-                description,
-                price,
-                category,
-                size,
-                color,
-                stock_quantity,
-                image_url
+                name, brand, category, gender, price,
+                sizes, stock, description, material, isNew,
+                image, hoverImage
             });
 
             return response.status(201).json(product);
@@ -35,11 +34,12 @@ export class ProductsController {
     async listAll(request: Request, response: Response): Promise<Response> {
         const listProductsService = container.resolve(ListProductsService);
         const products = await listProductsService.execute();
+    
         return response.json(products);
     }
 
     async show(request: Request, response: Response): Promise<Response> {
-        const { id } = request.params; // Pega o ID da URL
+        const { id } = request.params;
         const showProductService = container.resolve(ShowProductService);
         const product = await showProductService.execute(id);
 
@@ -71,5 +71,4 @@ export class ProductsController {
             return response.status(400).json({ error: (error as Error).message });
         }
     }
-
 }

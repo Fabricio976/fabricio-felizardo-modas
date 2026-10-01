@@ -1,5 +1,6 @@
 import { CreateUserService } from "../../../services/user/CreateUserService";
 import { IUsersRepository } from "../../../repositories/user/IUsersRepository";
+import { AppError } from "../../../shared/errors/AppError";
 
 const usersRepositoryMock = {
   create: jest.fn(),
@@ -57,7 +58,7 @@ describe("CreateUserService", () => {
         password: "123",
         birth_date: new Date(),
       })
-    ).rejects.toEqual(new Error("O usuário já existe!")); // aq verifica a mensagem exata
+    ).rejects.toStrictEqual(new AppError("O usuário já existe!", 409)); // aq verifica a mensagem exata
 
     expect(usersRepositoryMock.create).not.toHaveBeenCalled();
     expect(usersRepositoryMock.save).not.toHaveBeenCalled();

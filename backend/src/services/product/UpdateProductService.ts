@@ -1,6 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { IProductsRepository } from "../../repositories/product/IProductsRepository";
 import { IUpdateProductDTO } from "../../schemas/product.schema";
+import { AppError } from "../../shared/errors/AppError";
 
 @injectable()
 export class UpdateProductService {
@@ -13,7 +14,7 @@ export class UpdateProductService {
     const product = await this.productsRepository.findById(id);
 
     if (!product) {
-      throw new Error("Produto não encontrado.");
+      throw new AppError("Produto não encontrado.", 404);
     }
 
     // aq so mescla os dados novos no objeto existente de product

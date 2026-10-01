@@ -2,8 +2,9 @@ import { inject, injectable } from "tsyringe";
 import { IOrderedsRepository } from "../../repositories/ordered/IOrderedsRepository";
 import { IProductsRepository } from "../../repositories/product/IProductsRepository";
 import { AppDataSource } from "../../config/DataSource";
-import { Product } from "../../entities/product/Product";
 import { Ordered } from "../../entities/ordered/Ordered";
+import { Product } from "../../entities/product/Product";
+import { AppError } from "../../shared/errors/AppError"; 
 
 @injectable()
 export class CancelOrderedService {
@@ -27,27 +28,28 @@ export class CancelOrderedService {
             });
 
             if (!ordered) {
-                throw new Error("Pedido não encontrado.");
+                throw new AppError("Pedido não encontrado.", 404);
             }
+
             if (ordered.status === "CANCELED") {
-                throw new Error("Este pedido já foi cancelado.");
+                throw new AppError("Este pedido já foi cancelado.");
             }
 
             const productsToUpdate: Product[] = [];
 
             for (const item of ordered.items) {
                 const product = item.product;
-
-                product.stock_quantity += item.quantity;
-
+                product.stock += item.quantity;
                 productsToUpdate.push(product);
             }
 
+            // Salva os produtos com o estoque atualizado
             await queryRunner.manager.save(productsToUpdate);
 
+            // Atualiza o status do pedido
             ordered.status = "CANCELED";
-
             await queryRunner.manager.save(ordered);
+
             await queryRunner.commitTransaction();
 
             return ordered;

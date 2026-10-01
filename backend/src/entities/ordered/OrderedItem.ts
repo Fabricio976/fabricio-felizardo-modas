@@ -2,26 +2,31 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "t
 import { Ordered } from "./Ordered";
 import { Product } from "../product/Product";
 
-@Entity("orders_items")
+@Entity("ordered_items")
 export class OrderedItem {
-    
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @ManyToOne(() => Ordered, (ordered) => ordered.items)
-  @JoinColumn({ name: "order_id" })
+  @JoinColumn({ name: "ordered_id" })
   ordered!: Ordered;
-
-  @Column({ name: "product_id" })
-  product_id!: string;
 
   @ManyToOne(() => Product)
   @JoinColumn({ name: "product_id" })
   product!: Product;
 
-  @Column({ type: "decimal", precision: 10, scale: 2 })
-  price!: number; 
+  @Column()
+  size!: string; 
 
   @Column("int")
   quantity!: number;
+
+  @Column({ type: "decimal", precision: 10, scale: 2 })
+  price!: number;
+
+  @Column()
+  name!: string;
+  
+  @Column({ nullable: true })
+  image!: string;
 }

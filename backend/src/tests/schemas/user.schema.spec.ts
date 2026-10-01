@@ -17,7 +17,7 @@ describe("Validação de Schema de Usuário", () => {
   it("deve falhar se o e-mail for inválido", () => {
     const invalidData = {
       name: "Usuario 2",
-      email: "eusuario1exemplo.comm", // não tem @
+      email: "usuario1exemplo.comm", // não tem @
       password: "123456",
       birth_date: "2000-01-01",
     };

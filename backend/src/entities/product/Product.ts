@@ -6,32 +6,50 @@ export class Product {
   id!: string;
 
   @Column()
-  brand!: string; 
+  name!: string;
 
-  @Column({ nullable: true })
-  description!: string; 
+  @Column()
+  brand!: string;
+
+  @Column()
+  category!: string;
+
+  @Column({ type: "enum", enum: ["Masculino", "Feminino", "Unissex"] })
+  gender!: string;
 
   @Column({ type: "decimal", precision: 10, scale: 2 })
-  price!: number;
+  price!: number; 
 
   @Column()
-  category!: string; 
-
-  @Column()
-  size!: string; 
-
-  @Column()
-  color!: string;
-
-  @Column("int")
-  stock_quantity!: number;
+  image!: string;
 
   @Column({ nullable: true })
-  image_url!: string;
+  hoverImage!: string; 
+
+  @Column("simple-array") 
+  sizes!: string[];
+
+  @Column("int")
+  stock!: number;
+
+  @Column("text")
+  description!: string;
+
+  @Column()
+  material!: string;
+
+  @Column({ type: "decimal", precision: 3, scale: 1, default: 0 })
+  rating!: number;
+
+  @Column({ type: "int", default: 0 })
+  reviewCount!: number;
+
+  @Column({ type: "boolean", default: false })
+  isNew!: boolean;
 
   @CreateDateColumn()
   created_at!: Date;
 
   @UpdateDateColumn()
-  updated_a!: Date;
+  updated_at!: Date;
 }

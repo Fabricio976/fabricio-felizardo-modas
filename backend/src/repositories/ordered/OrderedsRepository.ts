@@ -1,8 +1,7 @@
 import { Repository } from "typeorm";
 import { AppDataSource } from "../../config/DataSource";
 import { Ordered } from "../../entities/ordered/Ordered";
-import { IOrderedsRepository, ICreateOrderedData } from "./IOrderedsRepository";
-import { OrderedItem } from "../../entities/ordered/OrderedItem";
+import { ICreateOrderedData, IOrderedsRepository } from "./IOrderedsRepository";
 
 export class OrderedsRepository implements IOrderedsRepository {
   private repository: Repository<Ordered>;
@@ -11,34 +10,30 @@ export class OrderedsRepository implements IOrderedsRepository {
     this.repository = AppDataSource.getRepository(Ordered);
   }
 
-  async create({ user_id, total, products }: ICreateOrderedData): Promise<Ordered> {
-    const orderedItems = products.map(product => {
-        const item = new OrderedItem();
-        item.product_id = product.product_id;
-        item.price = product.price;
-        item.quantity = product.quantity;
-        return item;
-    });
-
-    const order = this.repository.create({
+  async create({ user_id, total, status, items }: ICreateOrderedData): Promise<Ordered> {
+    const ordered = this.repository.create({
       user_id,
       total,
-      items: orderedItems,
-      status: "PAID" // já criado pago
+      status,
+      items,
     });
 
-    await this.repository.save(order);
+    await this.repository.save(ordered);
 
-    return order;
+    return ordered;
   }
 
-  async findByUserId(user_id: string): Promise<Ordered[]> {
-    const ordereds = await this.repository.find({
+  async listByUser(user_id: string): Promise<Ordered[]> {
+    return await this.repository.find({
       where: { user_id },
       relations: ["items", "items.product"], 
-      order: { created_at: "DESC" } // ordem decrecente, os mais recentes primeiro
     });
+  }
 
-    return ordereds;
+  async findById(id: string): Promise<Ordered | null> {
+    return await this.repository.findOne({
+      where: { id },
+      relations: ["items", "items.product"],
+    });
   }
 }

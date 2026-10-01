@@ -1,5 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { IUsersRepository } from "../../repositories/user/IUsersRepository";
+import { AppError } from "../../shared/errors/AppError";
 import { User } from "../../entities/user/User";
 
 @injectable()
@@ -14,7 +15,7 @@ export class ShowUserService {
     const user = await this.usersRepository.findById(id);
 
     if (!user) {
-      throw new Error("Usuário não encontrado!");
+      throw new AppError("Usuário não encontrado!", 404);
     }
 
     return user;

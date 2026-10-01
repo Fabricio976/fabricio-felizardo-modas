@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { verify } from "jsonwebtoken";
+import { AppError } from "../shared/errors/AppError";
 
 interface IPayload {
   sub: string;
@@ -9,7 +10,7 @@ export function ensureAuthenticated(request: Request, response: Response, next: 
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {
-    throw new Error("Token ausente!");
+    throw new AppError("Token ausente!", 401);
   }
 
   // Formato: "Bearer"
@@ -24,6 +25,6 @@ export function ensureAuthenticated(request: Request, response: Response, next: 
 
     return next();
   } catch {
-    throw new Error("Token inválido!");
+    throw new AppError("Token inválido!", 401);
   }
 }
