@@ -20,26 +20,20 @@ interface IResponse {
 export class AuthenticateUserService {
   constructor(
     @inject("UsersRepository")
-    private usersRepository: IUsersRepository
+    private readonly usersRepository: IUsersRepository
   ) {}
 
   async execute({ email, password }: IRequest): Promise<IResponse> {
     const user = await this.usersRepository.findByEmail(email);
 
-    if (!user) {
-      throw new Error("Email or password incorrect");
+    const isValidCredentials =
+      user && (await compare(password, user.password_hash));
+
+    if (!isValidCredentials) {
+      throw new Error("Email ou senha incorretos");
     }
 
-    const passwordMatch = await compare(password, user.password_hash);
-
-    if (!passwordMatch) {
-      throw new Error("Email or password incorrect");
-    }
-
-    const token = sign({}, process.env.JWT_SECRET as string, {
-      subject: user.id,
-      expiresIn: "30m",
-    });
+    const token = this.generateToken(user.id);
 
     return {
       user: {
@@ -48,5 +42,12 @@ export class AuthenticateUserService {
       },
       token,
     };
+  }
+
+  private generateToken(userId: string): string {
+    return sign({}, process.env.JWT_SECRET as string, {
+      subject: userId,
+      expiresIn: "30m",
+    });
   }
 }

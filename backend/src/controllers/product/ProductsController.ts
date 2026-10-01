@@ -9,6 +9,7 @@ import { DeleteProductService } from "../../services/product/DeleteProductServic
 export class ProductsController {
 
     async create(request: Request, response: Response): Promise<Response> {
+        
         const { brand, description, price, category, size, color, stock_quantity, image_url } = request.body;
         const createProductService = container.resolve(CreateProductService);
 
