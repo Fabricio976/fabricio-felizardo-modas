@@ -2,6 +2,7 @@ import { inject, injectable } from "tsyringe";
 import { compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { IUsersRepository } from "../../repositories/user/IUsersRepository";
+import { AppError } from "../../shared/errors/AppError";
 
 interface IRequest {
   email: string;
@@ -30,7 +31,7 @@ export class AuthenticateUserService {
       user && (await compare(password, user.password_hash));
 
     if (!isValidCredentials) {
-      throw new Error("Email ou senha incorretos");
+      throw new AppError("Email ou senha incorretos", 401);
     }
 
     const token = this.generateToken(user.id);

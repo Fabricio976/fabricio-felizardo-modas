@@ -26,6 +26,6 @@ describe("Delete Product", () => {
 
     await expect(
       deleteProductService.execute("non-existing")
-    ).rejects.toBeInstanceOf(AppError);
+    ).rejects.toStrictEqual(new AppError("Produto não encontrado.", 404));
   });
 });
